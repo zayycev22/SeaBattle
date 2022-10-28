@@ -184,12 +184,10 @@ async def msg_handler(ws):
         try:
             msg = await ws.recv()
         except Exception as ex:
-            print("EXCEPTION!!!!", ex)
             await handle_disconnected(ws)
             break
         else:
             msg = json.loads(msg)
-            print("HEADER =", msg['header'])
             await recv_funcs[msg["header"]](ws, msg["data"])
 
 
