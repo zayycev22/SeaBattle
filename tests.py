@@ -55,7 +55,6 @@ class HelpTest:
         self.ws1 = None
         self.ws2 = None
         for task in self.tasks:
-            print(task)
             task.cancel()
 
         yield json.loads(self.msg1)
@@ -77,29 +76,6 @@ class HelpTest:
         self.ws1 = None
         self.ws2 = None
         for task in self.tasks:
-            print(task)
-            task.cancel()
-        yield json.loads(self.msg1)
-
-    async def win_helper(self, mapData1, mapData2, coords):
-        self.tasks.extend([self.loop.create_task(self.listen1()), self.loop.create_task(self.listen2())])
-        await asyncio.sleep(1)
-        await self.ws1.send(generate_payload("knock-knock", {"nick": 'a'}))
-        await asyncio.sleep(0.4)
-        await self.ws2.send(generate_payload("knock-knock", {"nick": 'b'}))
-        await asyncio.sleep(0.4)
-        await self.ws1.send(json.dumps({"header": "send_map", 'data': mapData1}))
-        await asyncio.sleep(0.4)
-        await self.ws2.send(json.dumps({"header": "send_map", 'data': mapData2}))
-        await asyncio.sleep(2.1)
-        await self.ws1.send(
-            json.dumps({"header": "shoot", 'data': {'coords': {"x": coords[0], "y": coords[1]}, 'username': 'a'}}))
-        await asyncio.sleep(3)
-        # дописать
-        self.ws1 = None
-        self.ws2 = None
-        for task in self.tasks:
-            print(task)
             task.cancel()
         yield json.loads(self.msg1)
 
@@ -164,7 +140,6 @@ class TestServer:
         async for i in helper.in_game_helper(mapData1, mapData2):
             answer = i
         await asyncio.sleep(2)
-        print(answer)
         assert answer['header'] == "in_game!!!"
 
     @pytest.mark.asyncio
@@ -176,7 +151,6 @@ class TestServer:
         answer = {}
         async for i in helper.shoot_helper(mapData1, mapData2, (x, y)):
             answer = i
-        print(answer)
         await asyncio.sleep(0.4)
         assert answer['header'] == "killed"
 
@@ -187,7 +161,6 @@ class TestServer:
         answer = {}
         async for i in helper.shoot_helper(mapData1, mapData2, (x, y)):
             answer = i
-        print(answer)
         await asyncio.sleep(0.4)
         event_loop.stop()
         assert answer['header'] == "miss"
